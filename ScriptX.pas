@@ -26,6 +26,9 @@ type
     FContext : IScriptXContext;
     FScript : TPSScript;
     FCompiled : Boolean;
+    FOnExecute : TPSEvent;
+    FOnCompImport : TPSOnCompImportEvent;
+    FOnExecImport : TPSOnExecImportEvent;
     //procedure OnCompile(Sender: TPSScript);
     procedure InternalOnExecute(Sender: TPSScript);
     procedure InternalOnCompileImport(Sender: TObject; x: TPSPascalCompiler);
@@ -39,6 +42,9 @@ type
     function SetScript(AScript: string): IScriptX;
     function Execute: Boolean;
     function GetMethod(AMethodName : string) : TMethod;
+    function OnExecute(AOnExecute: TPSEvent): IScriptX;
+    function OnCompImport(AOnCompImport: TPSOnCompImportEvent): IScriptX;
+    function OnExecImport(AOnExecImport: TPSOnExecImportEvent): IScriptX;
   end;
 
 implementation
@@ -175,6 +181,24 @@ begin
       end;
     end;
   end;
+end;
+
+function TScriptX.OnCompImport(AOnCompImport: TPSOnCompImportEvent): IScriptX;
+begin
+  FOnCompImport := AOnCompImport;
+  Result := Self;
+end;
+
+function TScriptX.OnExecImport(AOnExecImport: TPSOnExecImportEvent): IScriptX;
+begin
+  FOnExecImport := AOnExecImport;
+  Result := Self;
+end;
+
+function TScriptX.OnExecute(AOnExecute: TPSEvent): IScriptX;
+begin
+  FOnExecute := AOnExecute;
+  Result := Self;
 end;
 
 function TScriptX.SetContext(AContext: IScriptXContext): IScriptX;

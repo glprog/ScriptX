@@ -2,7 +2,7 @@ unit ScriptX.Intf;
 
 interface
 
-uses System.Rtti, Data.DB, ScriptX.Common;
+uses System.Rtti, Data.DB, ScriptX.Common, uPSComponent;
 
 type
   IScriptXDataSetInfo = interface
@@ -42,6 +42,9 @@ type
     function SetScript(AScript : string) : IScriptX;
     function Execute : Boolean;
     function GetMethod(AMethodName : string) : TMethod;
+    function OnExecute(AOnExecute : TPSEvent) : IScriptX;
+    function OnCompImport(AOnCompImport : TPSOnCompImportEvent) : IScriptX;
+    function OnExecImport(AOnExecImport : TPSOnExecImportEvent) : IScriptX;
   end;
 
 implementation
