@@ -142,7 +142,9 @@ var LVariable : IScriptXVariable;
     //LDataSet : IScriptXDataSetInfo;
     LVariableType : string;
 begin
-  SIRegister_DB(x);
+  SIRegister_DB(x);{ TODO : Remover }
+  if Assigned(FOnCompImport) then
+    FOnCompImport(Sender, x);
   if Assigned(FContext) then
   begin
     for LVariable in FContext.GetVariables do
@@ -161,13 +163,17 @@ end;
 procedure TScriptX.InternalOnExecImport(Sender: TObject; se: TPSExec;
   x: TPSRuntimeClassImporter);
 begin
-  RIRegister_DB(x);
+  RIRegister_DB(x);{ TODO : Remover }
+  if Assigned(FOnExecImport) then
+    FOnExecImport(Sender, se, x);
 end;
 
 procedure TScriptX.InternalOnExecute(Sender: TPSScript);
 var LPPSVariant : PPSVariant;
     LVariable : IScriptXVariable;
 begin
+  if Assigned(FOnExecute) then
+    FOnExecute(Sender);
   if Assigned(FContext) then
   begin
     for LVariable in FContext.GetVariables do
