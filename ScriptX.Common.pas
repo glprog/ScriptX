@@ -9,6 +9,8 @@ type
 
   TOnGetValue = reference to procedure(var AValue : TValue);
 
+  IgnoreProc = class(TCustomAttribute);
+
 implementation
 
 end.

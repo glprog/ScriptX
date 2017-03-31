@@ -2,7 +2,7 @@ unit ScriptX;
 
 interface
 
-uses System.SysUtils, System.Generics.Collections , ScriptX.Common, ScriptX.Intf,
+uses System.SysUtils, System.Rtti, System.Generics.Collections , ScriptX.Common, ScriptX.Intf,
 uPSComponent, uPSCompiler, uPSRunTime, uPSR_DB, uPSC_DB;
 
 type
@@ -29,6 +29,7 @@ type
     FOnExecute : TPSEvent;
     FOnCompImport : TPSOnCompImportEvent;
     FOnExecImport : TPSOnExecImportEvent;
+    FMethods : TList<TRttiMethod>;
     //procedure OnCompile(Sender: TPSScript);
     procedure InternalOnExecute(Sender: TPSScript);
     procedure InternalOnCompileImport(Sender: TObject; x: TPSPascalCompiler);
@@ -45,6 +46,7 @@ type
     function OnExecute(AOnExecute: TPSEvent): IScriptX;
     function OnCompImport(AOnCompImport: TPSOnCompImportEvent): IScriptX;
     function OnExecImport(AOnExecImport: TPSOnExecImportEvent): IScriptX;
+    function RegisterProcs(ADummyClass : TClass): IScriptX;
   end;
 
 implementation
@@ -205,6 +207,11 @@ function TScriptX.OnExecute(AOnExecute: TPSEvent): IScriptX;
 begin
   FOnExecute := AOnExecute;
   Result := Self;
+end;
+
+function TScriptX.RegisterProcs(ADummyClass : TClass): IScriptX;
+begin
+
 end;
 
 function TScriptX.SetContext(AContext: IScriptXContext): IScriptX;

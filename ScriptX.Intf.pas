@@ -45,6 +45,7 @@ type
     function OnExecute(AOnExecute : TPSEvent) : IScriptX;
     function OnCompImport(AOnCompImport : TPSOnCompImportEvent) : IScriptX;
     function OnExecImport(AOnExecImport : TPSOnExecImportEvent) : IScriptX;
+    function RegisterProcs(ADummyClass : TClass) : IScriptX;
   end;
 
 implementation
