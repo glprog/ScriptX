@@ -101,17 +101,27 @@ begin
   FScript.OnCompImport := InternalOnCompileImport;
   FScript.OnExecImport := InternalOnExecImport;
   FScript.OnExecute := InternalOnExecute;
+  FMethods := TList<TRttiMethod>.Create;
 end;
 
 destructor TScriptX.Destroy;
 begin
   FScript.Free;
+  FMethods.Free;
   inherited;
 end;
 
 function TScriptX.Execute: Boolean;
+var LMsg : string;
+    I : Integer;
 begin
   FCompiled := FScript.Compile;
+  if not FCompiled then { TODO : Refatorar }
+  begin
+    for I := 0 to Pred(FScript.CompilerMessageCount) do
+      LMsg := LMsg + #13 + FScript.CompilerMessages[I].MessageToString;
+    raise Exception.Create('Erro: ' + LMsg);
+  end;
   Result := FCompiled and FScript.Execute;
 end;
 
@@ -173,9 +183,12 @@ end;
 procedure TScriptX.InternalOnExecute(Sender: TPSScript);
 var LPPSVariant : PPSVariant;
     LVariable : IScriptXVariable;
+    LMethod : TRttiMethod;
 begin
   if Assigned(FOnExecute) then
     FOnExecute(Sender);
+  for LMethod in FMethods do
+    Sender.Exec.RegisterDelphiFunction(LMethod.CodeAddress,LMethod.Name,cdRegister);
   if Assigned(FContext) then
   begin
     for LVariable in FContext.GetVariables do
@@ -210,8 +223,12 @@ begin
 end;
 
 function TScriptX.RegisterProcs(ADummyClass : TClass): IScriptX;
+var LType : TRttiType;
+    LMethod : TRttiMethod;
 begin
-
+  LType := TRttiContext.Create.GetType(ADummyClass);
+  for LMethod in LType.GetDeclaredMethods do
+    FMethods.Add(LMethod);
 end;
 
 function TScriptX.SetContext(AContext: IScriptXContext): IScriptX;
