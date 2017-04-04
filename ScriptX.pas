@@ -24,13 +24,17 @@ type
   TScriptX = class(TInterfacedObject, IScriptX)
   private
     FContext : IScriptXContext;
+    FRttiContext : TRttiContext;
     FScript : TPSScript;
     FCompiled : Boolean;
+    FOnCompile : TPSEvent;
     FOnExecute : TPSEvent;
     FOnCompImport : TPSOnCompImportEvent;
     FOnExecImport : TPSOnExecImportEvent;
     FMethods : TList<TRttiMethod>;
+    FDummyObject : TObject;
     //procedure OnCompile(Sender: TPSScript);
+    procedure InternalOnCompile(Sender : TPSScript);
     procedure InternalOnExecute(Sender: TPSScript);
     procedure InternalOnCompileImport(Sender: TObject; x: TPSPascalCompiler);
     procedure InternalOnExecImport(Sender: TObject; se: TPSExec; x: TPSRuntimeClassImporter);
@@ -43,6 +47,7 @@ type
     function SetScript(AScript: string): IScriptX;
     function Execute: Boolean;
     function GetMethod(AMethodName : string) : TMethod;
+    function OnCompile(AOnCompile: TPSEvent): IScriptX;
     function OnExecute(AOnExecute: TPSEvent): IScriptX;
     function OnCompImport(AOnCompImport: TPSOnCompImportEvent): IScriptX;
     function OnExecImport(AOnExecImport: TPSOnExecImportEvent): IScriptX;
@@ -100,14 +105,20 @@ begin
   FScript := TPSScript.Create(nil);
   FScript.OnCompImport := InternalOnCompileImport;
   FScript.OnExecImport := InternalOnExecImport;
+  FScript.OnCompile := InternalOnCompile;
   FScript.OnExecute := InternalOnExecute;
+  FRttiContext := TRttiContext.Create;
+  FRttiContext.KeepContext;
   FMethods := TList<TRttiMethod>.Create;
+  FDummyObject := nil;
 end;
 
 destructor TScriptX.Destroy;
 begin
   FScript.Free;
   FMethods.Free;
+  FDummyObject.Free;
+  FRttiContext.DropContext;
   inherited;
 end;
 
@@ -149,6 +160,18 @@ begin
   Result := FScript.Script.Text;
 end;
 
+procedure TScriptX.InternalOnCompile(Sender: TPSScript);
+var LMethod : TRttiMethod;
+begin
+  if Assigned(FOnCompile) then
+    FOnCompile(Sender);
+  if Assigned(FDummyObject) then
+  begin
+    for LMethod in FMethods do
+      Sender.AddMethod(FDummyObject, LMethod.CodeAddress, LMethod.ToString);
+  end;
+end;
+
 procedure TScriptX.InternalOnCompileImport(Sender: TObject; x: TPSPascalCompiler);
 var LVariable : IScriptXVariable;
     //LDataSet : IScriptXDataSetInfo;
@@ -187,8 +210,6 @@ var LPPSVariant : PPSVariant;
 begin
   if Assigned(FOnExecute) then
     FOnExecute(Sender);
-  for LMethod in FMethods do
-    Sender.Exec.RegisterDelphiFunction(LMethod.CodeAddress,LMethod.Name,cdRegister);
   if Assigned(FContext) then
   begin
     for LVariable in FContext.GetVariables do
@@ -202,6 +223,11 @@ begin
       end;
     end;
   end;
+end;
+
+function TScriptX.OnCompile(AOnCompile: TPSEvent): IScriptX;
+begin
+  FOnCompile := AOnCompile;
 end;
 
 function TScriptX.OnCompImport(AOnCompImport: TPSOnCompImportEvent): IScriptX;
@@ -226,7 +252,10 @@ function TScriptX.RegisterProcs(ADummyClass : TClass): IScriptX;
 var LType : TRttiType;
     LMethod : TRttiMethod;
 begin
-  LType := TRttiContext.Create.GetType(ADummyClass);
+  LType := FRttiContext.GetType(ADummyClass);
+  FMethods.Clear;
+  FreeAndNil(FDummyObject);
+  FDummyObject := ADummyClass.Create;
   for LMethod in LType.GetDeclaredMethods do
     FMethods.Add(LMethod);
 end;
