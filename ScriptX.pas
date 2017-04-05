@@ -41,6 +41,7 @@ type
   public
     constructor Create;
     destructor Destroy;override;
+    class function New : IScriptX;
     function GetContext: IScriptXContext;
     function GetScript: string;
     function SetContext(AContext: IScriptXContext): IScriptX;
@@ -223,6 +224,11 @@ begin
       end;
     end;
   end;
+end;
+
+class function TScriptX.New: IScriptX;
+begin
+  Result := Create;
 end;
 
 function TScriptX.OnCompile(AOnCompile: TPSEvent): IScriptX;
