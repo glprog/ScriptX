@@ -14,6 +14,7 @@ type
   public
     constructor Create;
     destructor Destroy;override;
+    class function New : IScriptXContext;
     procedure AddDataSet(ADataSetInfo: IScriptXDataSetInfo);
     procedure AddVariable(AVariable: IScriptXVariable);
     function GetVariables: System.TArray<ScriptX.Intf.IScriptXVariable>;
@@ -52,7 +53,7 @@ type
     function OnExecute(AOnExecute: TPSEvent): IScriptX;
     function OnCompImport(AOnCompImport: TPSOnCompImportEvent): IScriptX;
     function OnExecImport(AOnExecImport: TPSOnExecImportEvent): IScriptX;
-    function RegisterProcs(ADummyClass : TClass): IScriptX;
+    function RegisterMethods(ADummyClass : TClass): IScriptX;
   end;
 
 implementation
@@ -87,6 +88,11 @@ end;
 function TScriptXContext.GetVariables: System.TArray<ScriptX.Intf.IScriptXVariable>;
 begin
   Result := FVariableList.ToArray;
+end;
+
+class function TScriptXContext.New: IScriptXContext;
+begin
+  Result := Create;
 end;
 
 procedure TScriptXContext.RemoveDataSet(ADataSetInfo: IScriptXDataSetInfo);
@@ -254,7 +260,7 @@ begin
   Result := Self;
 end;
 
-function TScriptX.RegisterProcs(ADummyClass : TClass): IScriptX;
+function TScriptX.RegisterMethods(ADummyClass : TClass): IScriptX;
 var LType : TRttiType;
     LMethod : TRttiMethod;
 begin
