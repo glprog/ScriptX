@@ -12,6 +12,7 @@ type
     FValue : TValue;
     FType : TVariableType;
   public
+    class function New : IScriptXVariable;
     function GetName: string;
     function GetValue: TValue;
     function GetVariableType: TVariableType;
@@ -47,6 +48,11 @@ end;
 function TScriptXVariable.GetVariableType: TVariableType;
 begin
   Result := FType;
+end;
+
+class function TScriptXVariable.New: IScriptXVariable;
+begin
+  Result := Create;
 end;
 
 function TScriptXVariable.SetName(AName: string): IScriptXVariable;
