@@ -3,7 +3,7 @@ unit ScriptX;
 interface
 
 uses System.SysUtils, System.Rtti, System.Generics.Collections , ScriptX.Common, ScriptX.Intf,
-uPSComponent, uPSCompiler, uPSRunTime, uPSR_DB, uPSC_DB;
+uPSComponent, uPSCompiler, uPSRunTime, uPSR_DB, uPSC_DB, uPSUtils;
 
 type
 
@@ -34,11 +34,13 @@ type
     FOnExecImport : TPSOnExecImportEvent;
     FMethods : TList<TRttiMethod>;
     FDummyObject : TObject;
+    FCompiledData : AnsiString;
     //procedure OnCompile(Sender: TPSScript);
     procedure InternalOnCompile(Sender : TPSScript);
     procedure InternalOnExecute(Sender: TPSScript);
     procedure InternalOnCompileImport(Sender: TObject; x: TPSPascalCompiler);
     procedure InternalOnExecImport(Sender: TObject; se: TPSExec; x: TPSRuntimeClassImporter);
+    procedure LoadVars(AExec : TPSExec);
   public
     constructor Create;
     destructor Destroy;override;
@@ -151,15 +153,22 @@ end;
 function TScriptX.GetMethod(AMethodName : string) : TMethod;
 var LMsg : string;
     I : Integer;
+    LCompiler : TPSPascalCompiler;
+    LExec : TPSExec;
 begin
-  FCompiled := FScript.Compile;
+  LCompiler := Self.FScript.Comp;
+  LExec := FScript.Exec;
+  FCompiled := LCompiler.Compile(FScript.Script.Text);
   if not FCompiled then
   begin
-    for I := 0 to Pred(FScript.CompilerMessageCount) do
-      LMsg := LMsg + #13 + FScript.CompilerMessages[I].MessageToString;
+    for I := 0 to Pred(LCompiler.MsgCount) do
+      LMsg := LMsg + #13 + LCompiler.Msg[I].MessageToString;
     raise Exception.Create('Erro: ' + LMsg);
   end;
-  Result := FScript.GetProcMethod(AMethodName);
+  LCompiler.GetOutput(FCompiledData);
+  LExec.LoadData(FCompiledData);
+  LoadVars(LExec);
+  Result := LExec.GetProcAsMethodN(AMethodName);
 end;
 
 function TScriptX.GetScript: string;
@@ -169,6 +178,8 @@ end;
 
 procedure TScriptX.InternalOnCompile(Sender: TPSScript);
 var LMethod : TRttiMethod;
+    LVariable : IScriptXVariable;
+    LVariableType : string;
 begin
   if Assigned(FOnCompile) then
     FOnCompile(Sender);
@@ -187,7 +198,7 @@ begin
   SIRegister_DB(x);{ TODO : Remover }
   if Assigned(FOnCompImport) then
     FOnCompImport(Sender, x);
-  if Assigned(FContext) then
+    if Assigned(FContext) then
   begin
     for LVariable in FContext.GetVariables do
     begin
@@ -217,11 +228,18 @@ var LPPSVariant : PPSVariant;
 begin
   if Assigned(FOnExecute) then
     FOnExecute(Sender);
+  LoadVars(Sender.Exec);
+end;
+
+procedure TScriptX.LoadVars(AExec: TPSExec);
+var LPPSVariant : PPSVariant;
+    LVariable : IScriptXVariable;
+begin
   if Assigned(FContext) then
   begin
     for LVariable in FContext.GetVariables do
     begin
-      LPPSVariant := Sender.GetVariable(LVariable.GetName);
+      LPPSVariant := AExec.GetVar2(LVariable.GetName);
       case LVariable.GetVariableType of
         vtString : PPSVariantUString(LPPSVariant).Data := LVariable.GetValue.AsString;
         vtInteger : PPSVariantS32(LPPSVariant).Data := LVariable.GetValue.AsInteger;
