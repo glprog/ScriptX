@@ -206,7 +206,14 @@ begin
         vtString : LVariableType := 'string';
         vtInteger : LVariableType := 'integer';
         vtDouble : LVariableType := 'double';
-        vtObject : LVariableType := LVariable.GetValue.AsObject.ClassName;
+        vtObject :
+        begin
+          { TODO : Verificar }
+          if (LVariable.GetClassName = '') then //cast
+            LVariableType := LVariable.GetValue.AsObject.ClassName
+          else
+            LVariableType := LVariable.GetClassName;
+        end;
       end;
       x.AddVariable(LVariable.GetName, x.FindType(LVariableType));
     end;

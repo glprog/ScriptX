@@ -11,21 +11,29 @@ type
     FOnGetValue : TOnGetValue;
     FValue : TValue;
     FType : TVariableType;
+    FClassName : string;
   public
     class function New : IScriptXVariable;
     function GetName: string;
     function GetValue: TValue;
     function GetVariableType: TVariableType;
+    function GetClassName: string;
     function SetName(AName: string): IScriptXVariable;
     function SetOnGetValue(AProc: TOnGetValue): IScriptXVariable;
     function GetOnGetValue : TOnGetValue;
     function SetValue(AValue: TValue): IScriptXVariable;
     function SetVariableType(AType: TVariableType): IScriptXVariable;
+    function SetClassName(AClassName: string): IScriptXVariable;
   end;
 
 implementation
 
 { TScriptXVariable }
+
+function TScriptXVariable.GetClassName: string;
+begin
+  Result := FClassName;
+end;
 
 function TScriptXVariable.GetName: string;
 begin
@@ -53,6 +61,12 @@ end;
 class function TScriptXVariable.New: IScriptXVariable;
 begin
   Result := Create;
+end;
+
+function TScriptXVariable.SetClassName(AClassName: string): IScriptXVariable;
+begin
+  FClassName := AClassName;
+  Result := Self;
 end;
 
 function TScriptXVariable.SetName(AName: string): IScriptXVariable;

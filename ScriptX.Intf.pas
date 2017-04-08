@@ -21,6 +21,8 @@ type
     function SetValue(AValue : TValue) : IScriptXVariable;
     function GetVariableType : TVariableType;
     function SetVariableType(AType : TVariableType) : IScriptXVariable;
+    function GetClassName : string;
+    function SetClassName(AClassName : string) : IScriptXVariable;
     function GetOnGetValue : TOnGetValue;
     function SetOnGetValue(AProc : TOnGetValue) : IScriptXVariable;
   end;
