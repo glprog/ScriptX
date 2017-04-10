@@ -37,8 +37,7 @@ begin
   'end; ' +
   'begin end. ');
   LSumMethod := TSumMethod(FScript.GetMethod('Sum'));
-  if (LSumMethod(1,1) <> 2) then
-    raise Exception.Create('Erro Sum(1, 1) <> 2');
+  Assert.IsTrue(LSumMethod(1,1) = 2,'Sum(1,1) <> 2');
 end;
 
 procedure TTestScriptX.RunSimpleScript;
