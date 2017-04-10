@@ -64,10 +64,12 @@
 # Delphi history and backups
 __history/
 __recovery/
-Win32/Debug/
+Debug/
 *.~*
 
 # Castalia statistics file (since XE7 Castalia is distributed with Delphi)
 *.stat
+
+dunitx-results.xml
 
 # End of https://www.gitignore.io/api/delphi
