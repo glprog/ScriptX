@@ -41,6 +41,7 @@ type
     procedure InternalOnCompileImport(Sender: TObject; x: TPSPascalCompiler);
     procedure InternalOnExecImport(Sender: TObject; se: TPSExec; x: TPSRuntimeClassImporter);
     procedure LoadVars(AExec : TPSExec);
+    procedure LoadMethods(AExec : TPSExec);
   public
     constructor Create;
     destructor Destroy;override;
@@ -168,6 +169,7 @@ begin
   LCompiler.GetOutput(FCompiledData);
   LExec.LoadData(FCompiledData);
   LoadVars(LExec);
+  LoadMethods(LExec);
   Result := LExec.GetProcAsMethodN(AMethodName);
 end;
 
@@ -236,6 +238,17 @@ begin
   if Assigned(FOnExecute) then
     FOnExecute(Sender);
   LoadVars(Sender.Exec);
+end;
+
+procedure TScriptX.LoadMethods(AExec: TPSExec);
+var
+  LMethod : TRttiMethod;
+begin
+  if Assigned(FDummyObject) then
+  begin
+    for LMethod in FMethods do
+      AExec.RegisterDelphiMethod(FDummyObject, LMethod.CodeAddress, LMethod.ToString, cdRegister);
+  end;
 end;
 
 procedure TScriptX.LoadVars(AExec: TPSExec);
