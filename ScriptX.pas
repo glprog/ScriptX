@@ -288,13 +288,18 @@ end;
 function TScriptX.RegisterMethods(ADummyClass : TClass): IScriptX;
 var LType : TRttiType;
     LMethod : TRttiMethod;
+    LAttribute : TCustomAttribute;
 begin
   LType := FRttiContext.GetType(ADummyClass);
   FMethods.Clear;
   FreeAndNil(FDummyObject);
   FDummyObject := ADummyClass.Create;
   for LMethod in LType.GetDeclaredMethods do
-    FMethods.Add(LMethod);
+    for LAttribute in LMethod.GetAttributes do
+    begin
+      if LAttribute.ClassType = RegisterMethodAttribute then
+        FMethods.Add(LMethod);
+    end;
 end;
 
 function TScriptX.SetContext(AContext: IScriptXContext): IScriptX;

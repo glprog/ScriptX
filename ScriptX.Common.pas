@@ -11,6 +11,8 @@ type
 
   IgnoreProc = class(TCustomAttribute);
 
+  RegisterMethodAttribute = class(TCustomAttribute);
+
 implementation
 
 end.
