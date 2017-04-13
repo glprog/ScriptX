@@ -62,7 +62,7 @@ begin
   'end;' +
   'begin end.');
   LSomaMethod := TSomaMethod(FScript.GetMethod('Soma'));
-//  Assert.IsTrue(LSomaMethod(1,1) = 2,'Sum(1,1) <> 2');
+  Assert.IsTrue(LSomaMethod(1,1) = 2,'Sum(1,1) <> 2');
 end;
 
 procedure TTestScriptX.RunSimpleScript;

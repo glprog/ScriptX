@@ -154,23 +154,15 @@ end;
 function TScriptX.GetMethod(AMethodName : string) : TMethod;
 var LMsg : string;
     I : Integer;
-    LCompiler : TPSPascalCompiler;
-    LExec : TPSExec;
 begin
-  LCompiler := Self.FScript.Comp;
-  LExec := FScript.Exec;
-  FCompiled := LCompiler.Compile(FScript.Script.Text);
+  FCompiled := Self.FScript.Compile;
   if not FCompiled then
   begin
-    for I := 0 to Pred(LCompiler.MsgCount) do
-      LMsg := LMsg + #13 + LCompiler.Msg[I].MessageToString;
+    for I := 0 to Pred(FScript.Comp.MsgCount) do
+      LMsg := LMsg + #13 + FScript.Comp.Msg[I].MessageToString;
     raise Exception.Create('Erro: ' + LMsg);
   end;
-  LCompiler.GetOutput(FCompiledData);
-  LExec.LoadData(FCompiledData);
-  LoadVars(LExec);
-  LoadMethods(LExec);
-  Result := LExec.GetProcAsMethodN(AMethodName);
+  Result := FScript.GetProcMethod(AMethodName);
 end;
 
 function TScriptX.GetScript: string;
@@ -228,16 +220,13 @@ begin
   RIRegister_DB(x);{ TODO : Remover }
   if Assigned(FOnExecImport) then
     FOnExecImport(Sender, se, x);
+  LoadVars(se);
 end;
 
 procedure TScriptX.InternalOnExecute(Sender: TPSScript);
-var LPPSVariant : PPSVariant;
-    LVariable : IScriptXVariable;
-    LMethod : TRttiMethod;
 begin
   if Assigned(FOnExecute) then
     FOnExecute(Sender);
-  LoadVars(Sender.Exec);
 end;
 
 procedure TScriptX.LoadMethods(AExec: TPSExec);

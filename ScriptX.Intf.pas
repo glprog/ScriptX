@@ -44,10 +44,10 @@ type
     function SetScript(AScript : string) : IScriptX;
     function Execute : Boolean;
     function GetMethod(AMethodName : string) : TMethod;
-    function OnCompile(AOnCompile : TPSEvent) : IScriptX;
-    function OnExecute(AOnExecute : TPSEvent) : IScriptX;
-    function OnCompImport(AOnCompImport : TPSOnCompImportEvent) : IScriptX;
-    function OnExecImport(AOnExecImport : TPSOnExecImportEvent) : IScriptX;
+    function OnCompile(AOnCompile : TPSEvent) : IScriptX; { TODO : Remover dependência }
+    function OnExecute(AOnExecute : TPSEvent) : IScriptX; { TODO : Remover dependência }
+    function OnCompImport(AOnCompImport : TPSOnCompImportEvent) : IScriptX; { TODO : Remover dependência }
+    function OnExecImport(AOnExecImport : TPSOnExecImportEvent) : IScriptX; { TODO : Remover dependência }
     function RegisterMethods(ADummyClass : TClass) : IScriptX;
   end;
 
