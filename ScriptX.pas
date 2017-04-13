@@ -155,13 +155,14 @@ function TScriptX.GetMethod(AMethodName : string) : TMethod;
 var LMsg : string;
     I : Integer;
 begin
-  FCompiled := Self.FScript.Compile;
+  FCompiled := FScript.Compile;
   if not FCompiled then
   begin
     for I := 0 to Pred(FScript.Comp.MsgCount) do
       LMsg := LMsg + #13 + FScript.Comp.Msg[I].MessageToString;
     raise Exception.Create('Erro: ' + LMsg);
   end;
+  LoadVars(FScript.Exec);
   Result := FScript.GetProcMethod(AMethodName);
 end;
 
@@ -220,13 +221,13 @@ begin
   RIRegister_DB(x);{ TODO : Remover }
   if Assigned(FOnExecImport) then
     FOnExecImport(Sender, se, x);
-  LoadVars(se);
 end;
 
 procedure TScriptX.InternalOnExecute(Sender: TPSScript);
 begin
   if Assigned(FOnExecute) then
     FOnExecute(Sender);
+  LoadVars(Sender.Exec);
 end;
 
 procedure TScriptX.LoadMethods(AExec: TPSExec);

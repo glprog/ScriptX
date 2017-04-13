@@ -2,7 +2,8 @@ unit uPrincipal;
 
 interface
 uses
-  System.SysUtils, DUnitX.TestFramework, ScriptX.Intf, ScriptX, ScriptX.Common;
+  System.SysUtils, System.Rtti, DUnitX.TestFramework, ScriptX.Intf, ScriptX, ScriptX.Common,
+  ScriptX.Variable;
 
 type
 
@@ -19,6 +20,10 @@ type
     procedure RegisterMethods;
     [Test]
     procedure GetMethod;
+    [Test]
+    procedure RunScriptWithVariable;
+    [Test]
+    procedure GetMethodWithVariable;
   end;
 
   TDummy = class
@@ -48,6 +53,30 @@ begin
   Assert.IsTrue(LSumMethod(1,1) = 2,'Sum(1,1) <> 2');
 end;
 
+procedure TTestScriptX.GetMethodWithVariable;
+type
+  TSomeMethod = function : string of object;
+var
+  LSomeMethod : TSomeMethod;
+begin
+  FScript.SetContext(TScriptXContext.New);
+  FScript.GetContext.AddVariable(TScriptXVariable.New
+    .SetName('LSomeValue')
+    .SetVariableType(vtString)
+    .SetOnGetValue(procedure (var AValue : TValue)
+    begin
+      AValue := 'NOOB TEST';
+    end));
+  FScript.SetScript(
+  'function SomeMethod : string; ' +
+  'begin ' +
+  '  Result := LSomeValue; ' +
+  'end; ' +
+  'begin end. ');
+  LSomeMethod := TSomeMethod(FScript.GetMethod('SomeMethod'));
+  Assert.IsTrue(LSomeMethod = 'NOOB TEST' ,'LSomeMethod <> ''NOOB TEST''');
+end;
+
 procedure TTestScriptX.RegisterMethods;
 type
   TSomaMethod = function (A, B : Integer) : Integer of object;
@@ -63,6 +92,19 @@ begin
   'begin end.');
   LSomaMethod := TSomaMethod(FScript.GetMethod('Soma'));
   Assert.IsTrue(LSomaMethod(1,1) = 2,'Sum(1,1) <> 2');
+end;
+
+procedure TTestScriptX.RunScriptWithVariable;
+begin
+  FScript.SetContext(TScriptXContext.New);
+  FScript.GetContext.AddVariable(TScriptXVariable.New
+    .SetName('LSomeValue')
+    .SetVariableType(vtString)
+    .SetOnGetValue(procedure (var AValue : TValue)
+    begin
+      AValue := 'NOOB TEST';
+    end));
+  FScript.SetScript('var s : string; begin s := LSomeValue; end.').Execute;
 end;
 
 procedure TTestScriptX.RunSimpleScript;
