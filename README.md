@@ -7,6 +7,7 @@ Auxilia a adição de métodos e variáveis ao PascalScript
 type
   TDummy = class
   public
+	[RegisterMethod]
     procedure MostraMsg(AMsg : string);
   end;
 
