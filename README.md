@@ -1,5 +1,5 @@
 # ScriptX
-Auxilia a adição de métodos e variáveis ao PascalScript
+Auxilia a adiÃ§Ã£o de mÃ©todos e variÃ¡veis ao PascalScript
 
 ## Exemplo de uso
 
@@ -7,7 +7,7 @@ Auxilia a adição de métodos e variáveis ao PascalScript
 type
   TDummy = class
   public
-	[RegisterMethod]
+    [RegisterMethod]
     procedure MostraMsg(AMsg : string);
   end;
 
