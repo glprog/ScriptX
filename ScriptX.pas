@@ -34,14 +34,14 @@ type
     FOnExecImport : TPSOnExecImportEvent;
     FMethods : TList<TRttiMethod>;
     FDummyObject : TObject;
-    FCompiledData : AnsiString;
+    //FCompiledData : AnsiString;
     //procedure OnCompile(Sender: TPSScript);
     procedure InternalOnCompile(Sender : TPSScript);
     procedure InternalOnExecute(Sender: TPSScript);
     procedure InternalOnCompileImport(Sender: TObject; x: TPSPascalCompiler);
     procedure InternalOnExecImport(Sender: TObject; se: TPSExec; x: TPSRuntimeClassImporter);
     procedure LoadVars(AExec : TPSExec);
-    procedure LoadMethods(AExec : TPSExec);
+//    procedure LoadMethods(AExec : TPSExec);
   public
     constructor Create;
     destructor Destroy;override;
@@ -51,7 +51,7 @@ type
     function SetContext(AContext: IScriptXContext): IScriptX;
     function SetScript(AScript: string): IScriptX;
     function Execute: Boolean;
-    function GetMethod(AMethodName : string) : TMethod;
+    function GetMethod(AMethodName : AnsiString) : TMethod;
     function OnCompile(AOnCompile: TPSEvent): IScriptX;
     function OnExecute(AOnExecute: TPSEvent): IScriptX;
     function OnCompImport(AOnCompImport: TPSOnCompImportEvent): IScriptX;
@@ -133,7 +133,7 @@ begin
 end;
 
 function TScriptX.Execute: Boolean;
-var LMsg : string;
+var LMsg : AnsiString;
     I : Integer;
 begin
   FCompiled := FScript.Compile;
@@ -141,7 +141,7 @@ begin
   begin
     for I := 0 to Pred(FScript.CompilerMessageCount) do
       LMsg := LMsg + #13 + FScript.CompilerMessages[I].MessageToString;
-    raise Exception.Create('Erro: ' + LMsg);
+    raise Exception.Create('Erro: ' + string(LMsg));
   end;
   Result := FCompiled and FScript.Execute;
 end;
@@ -151,8 +151,8 @@ begin
   Result := FContext;
 end;
 
-function TScriptX.GetMethod(AMethodName : string) : TMethod;
-var LMsg : string;
+function TScriptX.GetMethod(AMethodName : AnsiString) : TMethod;
+var LMsg : AnsiString;
     I : Integer;
 begin
   FCompiled := FScript.Compile;
@@ -160,7 +160,7 @@ begin
   begin
     for I := 0 to Pred(FScript.Comp.MsgCount) do
       LMsg := LMsg + #13 + FScript.Comp.Msg[I].MessageToString;
-    raise Exception.Create('Erro: ' + LMsg);
+    raise Exception.Create('Erro: ' + string(LMsg));
   end;
   LoadVars(FScript.Exec);
   Result := FScript.GetProcMethod(AMethodName);
@@ -173,22 +173,22 @@ end;
 
 procedure TScriptX.InternalOnCompile(Sender: TPSScript);
 var LMethod : TRttiMethod;
-    LVariable : IScriptXVariable;
-    LVariableType : string;
+    //LVariable : IScriptXVariable;
+    //LVariableType : string;
 begin
   if Assigned(FOnCompile) then
     FOnCompile(Sender);
   if Assigned(FDummyObject) then
   begin
     for LMethod in FMethods do
-      Sender.AddMethod(FDummyObject, LMethod.CodeAddress, LMethod.ToString);
+      Sender.AddMethod(FDummyObject, LMethod.CodeAddress, AnsiString(LMethod.ToString));
   end;
 end;
 
 procedure TScriptX.InternalOnCompileImport(Sender: TObject; x: TPSPascalCompiler);
 var LVariable : IScriptXVariable;
     //LDataSet : IScriptXDataSetInfo;
-    LVariableType : string;
+    LVariableType : AnsiString;
 begin
   SIRegister_DB(x);{ TODO : Remover }
   if Assigned(FOnCompImport) then
@@ -205,9 +205,9 @@ begin
         begin
           { TODO : Verificar }
           if (LVariable.GetClassName = '') then //cast
-            LVariableType := LVariable.GetValue.AsObject.ClassName
+            LVariableType := AnsiString(LVariable.GetValue.AsObject.ClassName)
           else
-            LVariableType := LVariable.GetClassName;
+            LVariableType := AnsiString(LVariable.GetClassName);
         end;
       end;
       x.AddVariable(LVariable.GetName, x.FindType(LVariableType));
@@ -230,7 +230,7 @@ begin
   LoadVars(Sender.Exec);
 end;
 
-procedure TScriptX.LoadMethods(AExec: TPSExec);
+{procedure TScriptX.LoadMethods(AExec: TPSExec);
 var
   LMethod : TRttiMethod;
 begin
@@ -239,7 +239,7 @@ begin
     for LMethod in FMethods do
       AExec.RegisterDelphiMethod(FDummyObject, LMethod.CodeAddress, LMethod.ToString, cdRegister);
   end;
-end;
+end;}
 
 procedure TScriptX.LoadVars(AExec: TPSExec);
 var LPPSVariant : PPSVariant;

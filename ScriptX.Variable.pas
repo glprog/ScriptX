@@ -14,11 +14,11 @@ type
     FClassName : string;
   public
     class function New : IScriptXVariable;
-    function GetName: string;
+    function GetName: AnsiString;
     function GetValue: TValue;
     function GetVariableType: TVariableType;
     function GetClassName: string;
-    function SetName(AName: string): IScriptXVariable;
+    function SetName(AName: AnsiString): IScriptXVariable;
     function SetOnGetValue(AProc: TOnGetValue): IScriptXVariable;
     function GetOnGetValue : TOnGetValue;
     function SetValue(AValue: TValue): IScriptXVariable;
@@ -35,7 +35,7 @@ begin
   Result := FClassName;
 end;
 
-function TScriptXVariable.GetName: string;
+function TScriptXVariable.GetName: AnsiString;
 begin
   Result := FName;
 end;
@@ -69,7 +69,7 @@ begin
   Result := Self;
 end;
 
-function TScriptXVariable.SetName(AName: string): IScriptXVariable;
+function TScriptXVariable.SetName(AName: AnsiString): IScriptXVariable;
 begin
   FName := AName;
   Result := Self;

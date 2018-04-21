@@ -15,8 +15,8 @@ type
 
   IScriptXVariable = interface
     ['{AC48AA2C-E59B-4569-8673-8E78B62EC933}']
-    function GetName : string;
-    function SetName(AName : string) : IScriptXVariable;
+    function GetName : AnsiString;
+    function SetName(AName : AnsiString) : IScriptXVariable;
     function GetValue : TValue;
     function SetValue(AValue : TValue) : IScriptXVariable;
     function GetVariableType : TVariableType;
@@ -43,7 +43,7 @@ type
     function GetScript : string;
     function SetScript(AScript : string) : IScriptX;
     function Execute : Boolean;
-    function GetMethod(AMethodName : string) : TMethod;
+    function GetMethod(AMethodName : AnsiString) : TMethod;
     function OnCompile(AOnCompile : TPSEvent) : IScriptX; { TODO : Remover dependência }
     function OnExecute(AOnExecute : TPSEvent) : IScriptX; { TODO : Remover dependência }
     function OnCompImport(AOnCompImport : TPSOnCompImportEvent) : IScriptX; { TODO : Remover dependência }
